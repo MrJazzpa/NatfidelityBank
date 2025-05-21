@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, viewport-fit=cover" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#000000">
+    <title><%= locals.title %></title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.min.js">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/css/bootstrap.min.css" integrity="sha512-jnSuA4Ss2PkkikSOLtYs8BlYIeeIK1h99ty4YfvRPAlzr377vr3CXDb7sb7eEEBYjDtcYj+AjBH3FLv5uSJuXg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="manifest" href="__manifest.json">
+</head>
+
+<body>
+
+
+    <!-- App Header -->
+    <div class="appHeader no-border transparent position-absolute">
+        <div class="left">
+            <a href="#" class="headerButton goBack">
+                <ion-icon name="chevron-back-outline"></ion-icon>
+            </a>
+        </div>
+        <div class="pageTitle"></div>
+        <div class="right">
+        </div>
+    </div>
+    <!-- * App Header -->
+
+    <!-- App Capsule -->
+    <div id="appCapsule">
+
+        <div class="section mt-2 text-center">
+            <h1>Log in</h1>
+            <h4>Fill the form to log in</h4>
+        </div>
+        <div class="section mb-5 p-2">
+           <div id="msg"></div>
+            <form id="login">
+                <div class="card">
+                    <div class="card-body pb-1">
+                        <div class="form-group basic">
+                            <div class="input-wrapper">
+                                <label class="label" for="email1">Account Number</label>
+                                <input type="text" class="form-control" id="accountNumber" placeholder="Your Account Number" required>
+                                <i class="clear-input">
+                                    <ion-icon name="close-circle"></ion-icon>
+                                </i>
+                            </div>
+                        </div>
+
+                        <div class="form-group basic">
+                            <div class="input-wrapper">
+                                <label class="label" for="password1">Password</label>
+                                <input type="password" class="form-control" id="password" autocomplete="off"
+                                    placeholder="Your password" required>
+                                <i class="clear-input">
+                                    <ion-icon name="close-circle"></ion-icon>
+                                </i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="form-links mt-2">
+        
+                    <div><a  class="text-muted">Forgot Password?</a></div>
+                </div>
+
+                <div class="form-button-group  transparent">
+                    <button type="submit" class="btn btn-primary btn-block btn-lg">Log in</button>
+                </div>
+
+            </form>
+        </div>
+
+    </div>
+    <!-- * App Capsule -->
+
+
+
+    <!-- ========= JS Files =========  -->
+    <!-- Bootstrap -->
+    <script src="assets/js/lib/bootstrap.bundle.min.js"></script>
+    <!-- Ionicons -->
+    <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
+    <!-- Splide -->
+    <script src="assets/js/plugins/splide/splide.min.js"></script>
+    <!-- Base Js File -->
+    <script src="assets/js/base.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+
+    <script>
+        $(document).ready(function(){
+           $('#login').on('submit',function(e){
+
+                e.preventDefault();
+                 let acctNumber = $('#accountNumber').val();
+                 let Password = $('#password').val();
+                 $.post('/api/login',{
+                      AccountNumber:acctNumber,
+                      Password:Password
+                 },
+                 function(data){
+                    if(data.status==200){
+                       window.location.href="/userDashboard";
+                       
+                    }else{
+                        $('#msg').html(`<p class='alert alert-danger'>${data.error}</p>`);
+                    }
+                 }
+                )
+
+           })
+        })
+    </script>
+</body>
+
+</html>
