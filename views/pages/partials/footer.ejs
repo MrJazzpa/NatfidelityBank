@@ -311,12 +311,42 @@
     <script src="assets/js/plugins/splide/splide.min.js"></script>
     <!-- Base Js File -->
     <script src="assets/js/base.js"></script>
-
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <script>
         // Add to Home with 2 seconds delay.
         AddtoHome("2000", "once");
-    </script>
+        $(document).ready(function () {
+            
+            $.ajax({
+            url: '/api/getbank',
+            method: 'GET',
+            success: function (response) {
+                const accounts = response.data;
+                $('#banks').empty(); // Clear default option
+                $('#banks').append('<option disabled selected>Select an account</option>');
+                accounts.forEach(account => {
+               // const optionText = `${account.account_name} - ${account.account_number} (${account.bank_name})`;
+                $('#banks').append(`<option value="${account.bank_name}">${account.bank_name}</option>`);
+                });
+            },
+            error: function () {
+                console.log("Error Occured")
+            }
+            });
+        });
+        $('#sendmoney').on('submit',function(e){
+            e.preventDefault();
+            let acctnum = $('#account_number').val();
+            let amount  = $('#amount').val();
+            let bank = $('#banks').val();
+               localStorage.setItem('accountNumber', acctnum);
+                localStorage.setItem('amount', amount);
+                localStorage.setItem('bank', bank);
+                window.location.href = '/transaction-details';
 
+        })
+    </script>
+    
 </body>
 
 </html>

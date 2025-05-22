@@ -6,6 +6,8 @@ const verify_token = require('../middleware/verify_token');
 router.get('/login',pages.login);
 router.get('/logout',pages.logout)
 router.get('/userDashboard',verify_token,pages.userDashboard);
+router.get('/transaction-details',verify_token,pages.transactionDetails)
+router.get('/view-transaction/:sessionid',verify_token,pages.view_transaction)
 
 
 

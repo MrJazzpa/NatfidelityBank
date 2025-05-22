@@ -164,41 +164,35 @@
                     </div>
                     <div class="modal-body">
                         <div class="action-sheet-content">
-                            <form>
-                                <div class="form-group basic">
-                                    <div class="input-wrapper">
-                                        <label class="label" for="account2">From</label>
-                                        <select class="form-control custom-select" id="account2">
-                                            <option value="0">Savings (*** 5019)</option>
-                                            <option value="1">Investment (*** 6212)</option>
-                                            <option value="2">Mortgage (*** 5021)</option>
-                                        </select>
-                                    </div>
-                                </div>
+                            <form id="sendmoney">
 
                                 <div class="form-group basic">
                                     <div class="input-wrapper">
-                                        <label class="label" for="text11">To</label>
-                                        <input type="email" class="form-control" id="text11"
-                                            placeholder="Enter bank ID">
+                                        <label class="label" for="text11">Account Number</label>
+                                        <input type="text" class="form-control" id="account_number"  placeholder="Enter bank account number" required>
                                         <i class="clear-input">
                                             <ion-icon name="close-circle"></ion-icon>
                                         </i>
                                     </div>
                                 </div>
-
+                                <div class="form-group basic">
+                                    <div class="input-wrapper">
+                                        <select name="" id="banks" class="form-control" required>
+                                            <option value="" selected>Bank</option>
+                                            
+                                        </select>
+                                    </div>
+                                </div>
                                 <div class="form-group basic">
                                     <label class="label">Enter Amount</label>
                                     <div class="input-group mb-2">
                                         <span class="input-group-text" id="basic-addon1">$</span>
-                                        <input type="text" class="form-control" placeholder="Enter an amount"
-                                            value="100">
+                                        <input type="text" class="form-control" placeholder="Enter an amount" id="amount" required>
                                     </div>
                                 </div>
 
                                 <div class="form-group basic">
-                                    <button type="button" class="btn btn-primary btn-block btn-lg"
-                                        data-bs-dismiss="modal">Send</button>
+                                    <button type="submit" class="btn btn-primary btn-block btn-lg">Proceed</button>
                                 </div>
                             </form>
                         </div>
@@ -307,65 +301,45 @@
         <div class="section mt-4">
             <div class="section-heading">
                 <h2 class="title">Transactions</h2>
-                <a href="app-transactions.html" class="link">View All</a>
+                <a href="" class="link">View All</a>
             </div>
             <div class="transactions">
-                <!-- item -->
-                <a href="app-transaction-detail.html" class="item">
-                    <div class="detail">
-                        <img src="assets/img/sample/brand/1.jpg" alt="img" class="image-block imaged w48">
-                        <div>
-                            <strong>Amazon</strong>
-                            <p>Shopping</p>
+              <% transDetail.forEach(function(trans){ %>
+                 <% if(trans.transaction_type == 'debit'){ %>
+
+                    <a href="/view-transaction/<%= trans._id %>" class="item">
+                        <div class="detail">
+                            <ion-icon class="text-danger" name="arrow-up-outline"></ion-icon>
+                            <div>
+                               
+                                <strong><%= trans.account_name %></strong>
+                                <p><%= trans.date %></p>
+                            </div>
                         </div>
-                    </div>
-                    <div class="right">
-                        <div class="price text-danger"> - $ 150</div>
-                    </div>
-                </a>
-                <!-- * item -->
-                <!-- item -->
-                <a href="app-transaction-detail.html" class="item">
-                    <div class="detail">
-                        <img src="assets/img/sample/brand/2.jpg" alt="img" class="image-block imaged w48">
-                        <div>
-                            <strong>Apple</strong>
-                            <p>Appstore Purchase</p>
+                        <div class="right">
+                            <div class="price text-danger"> - $<%= trans.amount %></div>
                         </div>
-                    </div>
-                    <div class="right">
-                        <div class="price text-danger">- $ 29</div>
-                    </div>
-                </a>
-                <!-- * item -->
-                <!-- item -->
-                <a href="app-transaction-detail.html" class="item">
-                    <div class="detail">
-                        <img src="assets/img/sample/avatar/avatar3.jpg" alt="img" class="image-block imaged w48">
-                        <div>
-                            <strong>Alex Ljung</strong>
-                            <p>Transfer</p>
+                    </a>
+
+                <% }else if(trans.transaction_type =="credit"){%>
+
+                    <a href="/view-transaction/<%=trans._id %>" class="item">
+                        <div class="detail">
+                            <ion-icon class="text-success" name="arrow-down-outline"></ion-icon>
+                            <div>
+                                <strong><%= trans.account_name %></strong>
+                                <p><%= trans.date %></p>
+                            </div>
                         </div>
-                    </div>
-                    <div class="right">
-                        <div class="price">+ $ 1,000</div>
-                    </div>
-                </a>
-                <!-- * item -->
-                <!-- item -->
-                <a href="app-transaction-detail.html" class="item">
-                    <div class="detail">
-                        <img src="assets/img/sample/avatar/avatar4.jpg" alt="img" class="image-block imaged w48">
-                        <div>
-                            <strong>Beatriz Brito</strong>
-                            <p>Transfer</p>
+                        <div class="right">
+                            <div class="price  text-success"> + $<%= trans.amount %></div>
                         </div>
-                    </div>
-                    <div class="right">
-                        <div class="price text-danger">- $ 186</div>
-                    </div>
-                </a>
-                <!-- * item -->
+                    </a>
+
+                <%}else{%>
+                      <p class="alert alert-info">No Transaction Yet</p>
+              <%  } %>
+             <% }); %>
             </div>
         </div>
         <!-- * Transactions -->

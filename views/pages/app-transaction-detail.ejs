@@ -1,0 +1,177 @@
+ <%- include('partials/header') %>
+    <!-- * App Header -->
+
+    <!-- Dialog Basic -->
+    <div class="modal fade dialogbox" id="DialogBasic" data-bs-backdrop="static" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Delete</h5>
+                </div>
+                <div class="modal-body">
+                    Are you sure?
+                </div>
+                <div class="modal-footer">
+                    <div class="btn-inline">
+                        <a href="#" class="btn btn-text-secondary" data-bs-dismiss="modal">CANCEL</a>
+                        <a href="#" class="btn btn-text-primary" data-bs-dismiss="modal">DELETE</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- * Dialog Basic -->
+
+    <!-- App Capsule -->
+    <div id="appCapsule" class="full-height">
+
+        <div class="section mt-2 mb-2">
+
+
+            <div class="listed-detail mt-3">
+                <div class="icon-wrapper">
+                    <div class="iconbox bg-success">
+                        <ion-icon  name="arrow-forward-outline"></ion-icon>
+                    </div>
+                </div>
+                <h3 class="text-center mt-2">  Send Payment</h3>
+            </div>
+            <form id="send_transaction">
+            <ul class="listview flush transparent simple-listview no-space mt-3">
+                
+                <li>
+                    <strong>Account Number</strong>
+                    <span class="text-success" id="accountNumber"></span>
+                    <input type="hidden" id="account_number" value="">
+                </li>
+                <li>
+                    <strong>To</strong>
+                    <span id="account_name">Jordi Santiago</span>
+                </li>
+                <li>
+                    <strong>Bank Name</strong>
+                    <span id="bank"></span>
+                </li>
+                <li>
+                    <strong>TransactionsID</strong>
+                    <span id="transactionid"></span>
+                </li>
+                
+                <li>
+                    <strong>Amount</strong>
+                    <h3 class="m-0" id="amount"></h3>
+                </li>
+                <li>
+                    <strong>Date</strong>
+                    <span id="transaction_date"></span>
+                </li>
+                <li> <button type="submit" class="btn btn-success" style="margin-left: 35%; width: 30%;">Send Money</button></li>
+          
+            </ul>
+        </form>
+
+        </div>
+
+    </div>
+    <!-- * App Capsule -->
+     <%- include('partials/success_modal') %>
+
+    
+    
+
+
+    <!-- ========= JS Files =========  -->
+    <!-- Bootstrap -->
+    <script src="assets/js/lib/bootstrap.bundle.min.js"></script>
+    
+    <!-- Ionicons -->
+    <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
+    <!-- Splide -->
+    <script src="assets/js/plugins/splide/splide.min.js"></script>
+    <!-- Base Js File -->
+    <script src="assets/js/base.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script>
+            function generateRandomString(length) {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXY0123456789Zabcdefghijklmnopqrstuvwxyz';
+            let result = '';
+            for (let i = 0; i < length; i++) {
+            result += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return result;
+        }
+        function formatAMPM(date) {
+                const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
+                                "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+                const month = months[date.getMonth()];
+                const day = date.getDate();
+                const year = date.getFullYear();
+
+                let hours = date.getHours();
+                let minutes = date.getMinutes();
+                const ampm = hours >= 12 ? 'PM' : 'AM';
+
+                hours = hours % 12;
+                hours = hours ? hours : 12; // hour '0' should be '12'
+                minutes = minutes < 10 ? '0' + minutes : minutes;
+
+                return `${month} ${day}, ${year} ${hours}:${minutes} ${ampm}`;
+           }
+
+        $(document).ready(function () {
+            const account_number = localStorage.getItem('accountNumber');
+            const Amount = localStorage.getItem('amount');
+            const bank = localStorage.getItem('bank');
+             let account_Name ="";
+            const randomStr = generateRandomString(25); // Change 10 to desired length
+            const now = new Date();
+            const formattedDate = formatAMPM(now);
+            $('#transaction_date').text(formattedDate);
+             $('#accountNumber').html(account_number)
+             $('#account_number').val(account_number);
+             $('#bank').html(bank);
+             $('#amount').html(Amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","))
+             $('#transactionid').html(randomStr);
+            
+             $.ajax({
+                  url:`/api/getname/${account_number}`,
+                  method:"GET",
+                  success:function(response){
+                    account_Name=response.data.account_name;
+                     $('#account_name').html(response.data.account_name);
+                  }
+
+             })
+
+             $('#send_transaction').on('submit',function(e){
+                 e.preventDefault();
+                  let userid = $('#userid').val();
+                 $.post('/api/transaction',
+                 {   
+                     userid:userid,
+                     AccountNumber :account_number,
+                     AccountName :account_Name,
+                     BankName:bank,
+                      Transid:randomStr,
+                      Amount:Amount,
+                      trans_date:formattedDate
+                 },
+                function(response){
+                    if(response.status==200){
+                        $('#successModal').modal('show');
+                      
+                    }else if(response.status==400){
+                         alert(response.error);
+                    }else{
+                         alert(response.error);
+                    }
+                });
+             })
+            
+            });
+    </script>
+
+
+</body>
+
+</html>

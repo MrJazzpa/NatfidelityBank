@@ -2,7 +2,8 @@ const Account_Model = require('../model/account_model');
 const Balance_model = require('../model/account_Balance');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const account_Balance = require('../model/account_Balance');
+const bank_model = require('../model/Banks_model');
+const Trans_model = require('../model/transaction');
 
 function getRandom10DigitNumber() {
     const min = 1000000000; // Smallest 10-digit number
@@ -79,14 +80,14 @@ exports.updateBalance = async(req,res)=>{
          res.json({error:"Input fields must be filled"})
       }else{
         try{
-            const get_balance = await account_Balance.findOne({ID:accountNumber})
+            const get_balance = await Balance_model.findOne({ID:accountNumber})
             if(get_balance){
                 const balance = Balance + parseFloat(get_balance.balance.replace(/,/g,""));
                 const income  = Income + parseFloat(get_balance.income.replace(/,/g,""));
                 const expenses = Expenses + parseFloat(get_balance.expenses.replace(/,/g,""));
                 const totalbill = TotalBill + parseFloat(get_balance.totalbill.replace(/,/g,""));
                 const savings= Savings + parseFloat(get_balance.savings.replace(/,/g,""));
-                const saveupdate = await account_Balance.updateOne({ID:accountNumber},{balance:balance.toLocaleString('en-Us',{minimumFractionDigits:2}),income:income.toLocaleString('en-Us',{minimumFractionDigits:2}),expenses:expenses.toLocaleString('en-Us',{minimumFractionDigits:2}),totalbill:totalbill.toLocaleString('en-Us',{minimumFractionDigits:2}),savings:savings.toLocaleString('en-Us',{minimumFractionDigits:2})});
+                const saveupdate = await Balance_model.updateOne({ID:accountNumber},{balance:balance.toLocaleString('en-Us',{minimumFractionDigits:2}),income:income.toLocaleString('en-Us',{minimumFractionDigits:2}),expenses:expenses.toLocaleString('en-Us',{minimumFractionDigits:2}),totalbill:totalbill.toLocaleString('en-Us',{minimumFractionDigits:2}),savings:savings.toLocaleString('en-Us',{minimumFractionDigits:2})});
                 if(saveupdate){
                     res.json({data:"Account has been updated"});
                 }else{
@@ -106,3 +107,138 @@ exports.updateBalance = async(req,res)=>{
       }
     
  }
+
+ exports.uploadBank = async(req,res)=>{ 
+      
+     const acctnum = req.body.AccountNumber;
+     const acctname = req.body.AccountName;
+     const bank = req.body.Bank;
+     if(acctnum =="" && acctname == "" && bank == ""){
+         return res.status(500).json({error:"Inputs cannot be empty"});
+     }else{
+        try{
+            const  saveBank = await bank_model.create({account_number:acctnum,account_name:acctname,bank_name:bank});
+            if(saveBank){
+                return  res.json({success:"Bank Saved"})
+            }else{
+                return res.json({error:"Unable to save bank"})
+            }
+        }catch(err){
+             console.error(err.message);
+            return res.json({error:err.message});
+        }
+     }
+
+      
+ }
+
+ exports.getbank = async(req,res)=>{
+      await bank_model.find()
+      .then(result=>{
+          res.json({data:result});
+      }).catch(error=>{
+          console.error(error.message)
+          res.status(500).json({error:error.message});
+      })
+ }
+ exports.getname = async(req,res)=>{
+    await bank_model.findOne({account_number:req.params.account_number},{account_name:1})
+    .then(result=>{
+        res.json({data:result});
+    }).catch(error=>{
+        console.error(error.message)
+        res.status(500).json({error:error.message});
+    })
+ }
+
+ exports.transaction= async(req,res)=>{
+      let userid = req.body.userid;
+      let account_number = req.body.AccountNumber;
+      let account_name = req.body.AccountName;
+      let bank_name = req.body.BankName;
+      let transid = req.body.Transid;
+      let Amount = parseFloat(req.body.Amount.replace(/,/g,""));
+      let trans_date = req.body.trans_date
+      let transaction_type="debit";
+       let final_balance =0;
+     try{
+      
+            let get_balance = await Balance_model.findOne({ID:userid});
+            let balance = parseFloat(get_balance.balance.replace(/,/g,""));
+             if(Amount>balance){
+                res.json({error:"Insufficient Balance",status:500});
+             }else{
+
+                final_balance = balance - Amount;
+                let update_balance = await Balance_model.updateOne({ID:userid},{balance:final_balance.toLocaleString('en-Us',{minimumFractionDigits:2})})
+                if(update_balance){
+                    let Trans_history = await Trans_model.create({ID:userid,account_number:account_number,account_name:account_name,bank_name:bank_name,amount:Amount.toLocaleString('en-Us',{maximumFractionDigits:2}),transaction_type:transaction_type,transactionid:transid,date:trans_date})
+                    if(Trans_history){
+                        return res.json({data:"Successfull",status:200});
+                    }
+                }else{
+                    console.log("Balance could not be updated");
+                     return res.json({error:"Balance could not be updated"})
+                }
+             }
+     }catch(err){
+        console.error(err.message);
+        return res.status(500).json({error:err.message});
+     }
+ }
+ function generateRandomAlphanumeric(length) {
+    const chars = 'ABCDEFGHIJK0123456789LMNOPQRSTUVWXYZa0123456789bcdefghijkl';
+    let result = '';
+    for (let i = 0; i < length; i++) {
+      const randIndex = Math.floor(Math.random() * chars.length);
+      result += chars[randIndex];
+    }
+    return result;
+  }
+  function formatDateTime() {
+    const date = new Date();
+  
+    // Format options
+    const options = {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: 'numeric',
+      minute: '2-digit',
+      hour12: true
+    };
+  
+    return date.toLocaleString('en-US', options);
+  }
+ exports.admin_transaction= async(req,res)=>{
+    let userid = req.body.userid;
+    let SenderAccountNumber = req.body.SenderAccountNumber;
+    let account_name = req.body.AccountName;
+    let bank_name = req.body.BankName;
+    let transid = generateRandomAlphanumeric(25);
+    let Amount = parseFloat(req.body.Amount.replace(/,/g,""));
+    let trans_date = formatDateTime();
+    let transaction_type="credit";
+     let final_balance =0;
+   try{
+    
+          let get_balance = await Balance_model.findOne({ID:userid});
+          let balance = parseFloat(get_balance.balance.replace(/,/g,""));
+          
+          final_balance = balance + Amount;
+          let update_balance = await Balance_model.updateOne({ID:userid},{balance:final_balance.toLocaleString('en-Us',{minimumFractionDigits:2})})
+          if(update_balance){
+              let Trans_history = await Trans_model.create({ID:userid,account_number:SenderAccountNumber,account_name:account_name,bank_name:bank_name,amount:Amount.toLocaleString('en-Us',{maximumFractionDigits:2}),transaction_type:transaction_type,transactionid:transid,date:trans_date})
+              if(Trans_history){
+                  return res.json({data:"Successfull",status:200});
+              }
+          }else{
+              console.log("Balance could not be updated");
+                return res.json({error:"Balance could not be updated"})
+          }
+   }catch(err){
+      console.error(err.message);
+      return res.status(500).json({error:err.message});
+   } 
+}
+    
