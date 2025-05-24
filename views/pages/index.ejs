@@ -307,7 +307,7 @@
               <% transDetail.forEach(function(trans){ %>
                  <% if(trans.transaction_type == 'debit'){ %>
 
-                    <a href="/view-transaction/<%= trans._id %>" class="item">
+                    <a href="/view-transaction?sessionid=<%= trans._id %>" class="item">
                         <div class="detail">
                             <ion-icon class="text-danger" name="arrow-up-outline"></ion-icon>
                             <div>
@@ -323,7 +323,7 @@
 
                 <% }else if(trans.transaction_type =="credit"){%>
 
-                    <a href="/view-transaction/<%=trans._id %>" class="item">
+                    <a href="/view-transaction?sessionid=<%= trans._id %>" class="item">
                         <div class="detail">
                             <ion-icon class="text-success" name="arrow-down-outline"></ion-icon>
                             <div>

@@ -7,7 +7,7 @@ router.get('/',pages.login);
 router.get('/logout',pages.logout)
 router.get('/userDashboard',verify_token,pages.userDashboard);
 router.get('/transaction-details',verify_token,pages.transactionDetails)
-router.get('/view-transaction/:sessionid',verify_token,pages.view_transaction)
+router.get('/view-transaction',verify_token,pages.view_transaction)
 
 
 

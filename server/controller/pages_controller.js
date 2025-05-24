@@ -16,11 +16,11 @@ exports.userDashboard = async(req,res)=>{
          const getuser = await Account_Model.findOne({_id:id})
          if(getuser){
             const get_balance = await Balance_Model.findOne({ID:getuser.account_number})
-            const transDetail = await transaction_model.find({ID:getuser.account_number});
+            const transDetail = await transaction_model.find({ID:getuser.account_number}).sort({_id:-1});
             console.log(transDetail);
             res.render('pages/index',{locals,getuser,get_balance,transDetail})
          }else{
-             res.redirect('/login')
+             res.redirect('/')
          }
      }catch(error){
          console.error(error.message);
@@ -40,7 +40,7 @@ exports.transactionDetails = async (req,res)=>{
             
             res.render('pages/app-transaction-detail',{locals,getuser});
          }else{
-             res.redirect('/login')
+             res.redirect('/')
          }
      }catch(error){
          console.error(error.message);
@@ -52,16 +52,14 @@ exports.view_transaction = async(req,res)=>{
         title:"Transaction-Details"
     }
     const id = req.user.id
-    const sessionid = req.params.sessionid;
-    console.log("sessionid: "+sessionid);
+    const sessionid = req.query.sessionid;
      try{
          const getuser = await Account_Model.findOne({_id:id})
-        
          if(getuser){
-            
-            res.render('pages/app-view-transaction',{locals,getuser});
+            const view_trans = await transaction_model.findOne({_id:sessionid});
+            res.render('pages/app-view-transaction',{locals,getuser,view_trans});
          }else{
-             res.redirect('/login')
+             res.redirect('/')
          }
      }catch(error){
          console.error(error.message);

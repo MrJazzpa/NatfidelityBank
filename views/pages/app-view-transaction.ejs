@@ -9,14 +9,39 @@
             <div class="tab-pane fade show active" id="waiting" role="tabpanel">
                 <div class="row">
                     <div class="col-12">
-                        <div class="bill-box">
-                            <div class="img-wrapper">
-                                <img src="assets/img/sample/brand/2.jpg" alt="img" class="image-block imaged w48">
-                            </div>
-                            <div class="price">$ 8</div>
-                            <p>Monthly Payment </p>
-                            <a href="#" class="btn btn-primary btn-block btn-sm">PAY NOW</a>
-                        </div>
+                        <ul class="listview flush transparent simple-listview no-space mt-3">
+                
+                            <li>
+                                <strong>Recipient Number</strong>
+                                <span class="text-success" id="accountNumber"><%= view_trans.account_number %></span>
+                                <input type="hidden" id="account_number" value="">
+                            </li>
+                            <li>
+                                <strong>Recipient Name</strong>
+                                <span id="Reciept_name"><%= view_trans.account_name %></span>
+                            </li>
+                            
+                            <li>
+                                <strong>TransactionsID</strong>
+                                <span id="transactionid"><%= view_trans.transactionid %></span>
+                            </li>
+                            <li>
+                                <strong>Transactions Type</strong>
+                                <span id="transactionid"><%= view_trans.transaction_type %></span>
+                            </li>
+
+                            <li>
+                                <strong>SessionID</strong>
+                                <span id="transactionid"><%= view_trans._id %></span>
+                            </li>
+                            
+                            <li>
+                                <strong>Date</strong>
+                                <span id="transaction_date"><%= view_trans.date %></span>
+                            </li>
+                            <li> <button type="submit" class="btn btn-success" style="margin-left: 35%; width: 30%;">print</button></li>
+                      
+                        </ul>
                     </div>
                     
                 </div>
